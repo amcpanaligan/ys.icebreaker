@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="ys.icebreaker" ng-strict-di>
+<head>
+    <title>YS | Icebreaker</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- add favicon syntax -->
+    <!-- Compiled and minified CSS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../bower_components/Materialize/dist/css/materialize.min.css">
+    <link rel="stylesheet" href="../bower_components/angular-material/angular-material.min.css">
+    <link rel="stylesheet" href="css/ys.icebreaker.css">
+</head>
+<body>
+
+    <div id="main-content">
+        
+        <div id="side-controls" class="right-align" ng-controller="navController">
+            <a class="btn-floating ys" ng-click="reset($event)"><i class="material-icons">repeat</i></a>
+            <!--<a class="btn-floating ys"><i class="material-icons">settings</i></a>-->
+        </div>
+
+        <div ui-view></div>
+    </div>
+
+    <!-- materialize and jQuery first -->
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="../bower_components/Materialize/dist/js/materialize.min.js"></script>
+
+    <!-- js 3rd party references first -->
+    <script src="../bower_components/angular/angular.min.js"></script>
+    <script src="../bower_components/angular-aria/angular-aria.min.js"></script>
+    <script src="../bower_components/angular-animate/angular-animate.min.js"></script>
+    <script src="../bower_components/angular-material/angular-material.min.js"></script>
+    <script src="../bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+
+    <!-- angular modules/dependencies/directives references -->
+    <script src="../bower_components/a0-angular-storage/dist/angular-storage.min.js"></script>
+    <script src="../bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+
+    <!-- min file: use gulp uglify -->
+    <script src="dist/main.min.js"></script>
+    <!-- debug file: use gulp concat -->
+    <!--<script src="dist/main.js"></script>-->
+</body>
+</html>
