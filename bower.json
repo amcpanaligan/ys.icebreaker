@@ -1,0 +1,29 @@
+{
+  "name": "ys.icebreaker",
+  "description": "",
+  "main": "",
+  "moduleType": [
+    "node"
+  ],
+  "authors": [
+    "amcpanaligan"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/amcpanaligan",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.5.2",
+    "a0-angular-storage": "~0.0.13",
+    "angular-sanitize": "~1.5.2",
+    "angular-material": "~1.0.6",
+    "Materialize": "materialize#~0.97.5",
+    "angular-ui-router": "~0.2.18"
+  }
+}
