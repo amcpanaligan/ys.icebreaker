@@ -9,7 +9,7 @@
 
                 var confirm = $mdDialog.confirm()
                   .title('Reset the game?')
-                  .textContent('There is/are (' + icebreakers.length + ') question(s) left. Continue?')
+                  .textContent('There is/are (' + icebreakers.length + ') question(s) left. Reset?')
                   .ariaLabel('Confirm')
                   .targetEvent($event)
                   .ok('Yes')
