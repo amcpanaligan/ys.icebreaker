@@ -7,15 +7,9 @@
         
         $urlRouterProvider.otherwise('/game');
         
-        $stateProvider.state('icebreakers', {
-            url: '/icebreakers',
-            templateUrl: 'templates/icebreaker/icebreaker-list.html',
-            controller: 'icebreakerListController'
-        });
-        
         $stateProvider.state('game', {
             url: '/game',
-            templateUrl: 'templates/icebreaker/icebreaker-game.html',
+            templateUrl: 'templates/icebreaker-game.html',
             controller: 'icebreakerGameController'
         });
         

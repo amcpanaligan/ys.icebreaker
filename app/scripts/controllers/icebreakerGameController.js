@@ -1,7 +1,7 @@
 (function (angular) {
     'use strict';
     
-    var icebreakerGameController = function ($mdToast, $log, $scope, icebreakerService) {
+    var icebreakerGameController = function ($mdDialog, $mdToast, $log, $scope, icebreakerService) {
         $scope.$on('gameover', function (event) {
             
         });
@@ -20,9 +20,37 @@
             var icebreaker = icebreakerService.getRandomIcebreaker();
             $scope.icebreaker = icebreaker;
         };
+        
+        $scope.reset = function ($event) {
+            var icebreakers = icebreakerService.getIcebreakers();
+            if (icebreakers.length > 0) {
+
+                var confirm = $mdDialog.confirm()
+                  .title('Reset the game?')
+                  .textContent('There is/are (' + icebreakers.length + ') question(s) left. Reset?')
+                  .ariaLabel('Confirm')
+                  .targetEvent($event)
+                  .ok('Yes')
+                  .cancel('No');
+                
+                $mdDialog.show(confirm).then(function () {
+                    reset();
+                }, function () {
+                    
+                });
+
+            } else {
+                reset();
+            }
+        };
+        
+        function reset () {
+            $scope.$broadcast('reset');
+            icebreakerService.reset();
+        }
     };
     
-    icebreakerGameController.$inject = ['$mdToast', '$log', '$scope', 'icebreakerService'];
+    icebreakerGameController.$inject = ['$mdDialog', '$mdToast', '$log', '$scope', 'icebreakerService'];
     
     angular.module('ys.icebreaker').controller('icebreakerGameController', icebreakerGameController);
     
