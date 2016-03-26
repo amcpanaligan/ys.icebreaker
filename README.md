@@ -2,7 +2,6 @@
 Self interest development of a simple icebreaker app for ys, in conjunction with my desire to learn material design and angular-material directives.
 
 This app uses:
- * jquery
  * angular
  * Materialize
  * angular-material

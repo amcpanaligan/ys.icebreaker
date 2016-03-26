@@ -5,3 +5,8 @@
 .ys {
     background-color: #00beff !important;   
 }
+
+md-toast .md-toast-content {
+    background-color: #00beff !important;
+    color: rgb(250,250,250);
+}

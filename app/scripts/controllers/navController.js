@@ -27,8 +27,8 @@
         };
         
         function reset () {
-            icebreakerService.reset();
             $rootScope.$broadcast('reset');
+            icebreakerService.reset();
         }
     };
 
