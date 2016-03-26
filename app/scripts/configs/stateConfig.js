@@ -9,7 +9,7 @@
         
         $stateProvider.state('game', {
             url: '/game',
-            templateUrl: 'templates/icebreaker-game.html',
+            template: '<ys-icebreaker-game></ys-icebreaker-game>',
             controller: 'icebreakerGameController'
         });
         
