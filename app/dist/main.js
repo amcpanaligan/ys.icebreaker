@@ -1,4 +1,5 @@
 (function () {
+    //// initialize the app ys.icebreakers and its dependencies.
     var app = angular.module('ys.icebreaker', [
         'angular-storage',
         'ngMaterial',
@@ -32,15 +33,9 @@
         
         $urlRouterProvider.otherwise('/game');
         
-        $stateProvider.state('icebreakers', {
-            url: '/icebreakers',
-            templateUrl: 'templates/icebreaker/icebreaker-list.html',
-            controller: 'icebreakerListController'
-        });
-        
         $stateProvider.state('game', {
             url: '/game',
-            templateUrl: 'templates/icebreaker/icebreaker-game.html',
+            templateUrl: 'templates/icebreaker-game.html',
             controller: 'icebreakerGameController'
         });
         
@@ -50,51 +45,33 @@
 (function (angular) {
     'use strict';
     
-    var icebreakerGameController = function ($log, $scope, icebreakerService) {
+    var icebreakerGameController = function ($mdDialog, $mdToast, $log, $scope, icebreakerService) {
         $scope.$on('gameover', function (event) {
             
         });
         
         $scope.$on('reset', function (event) {
-            $scope.icebreaker = 'The game was reset.';
+            //$scope.icebreaker = '';
+            var toast = $mdToast.simple({
+                textContent: 'The game was successfully reset.',
+                position: 'top right',
+                action: 'Dismiss'
+            });
+            $mdToast.show(toast);
         });
         
         $scope.play = function () {
             var icebreaker = icebreakerService.getRandomIcebreaker();
             $scope.icebreaker = icebreaker;
         };
-    };
-    
-    icebreakerGameController.$inject = ['$log', '$scope', 'icebreakerService'];
-    
-    angular.module('ys.icebreaker').controller('icebreakerGameController', icebreakerGameController);
-    
-})(angular);
-(function (angular) {
-    'use strict';
-    
-    var icebreakerListController = function ($scope, icebreakerService) {
         
-    };
-    
-    icebreakerListController.$inject = ['$scope', 'icebreakerService'];
-    
-    angular.module('ys.icebreaker').controller('icebreakerListController', icebreakerListController);
-    
-})(angular);
-
-(function (angular) {
-    'use strict';
-
-    var navController = function ($mdDialog, $rootScope, $scope, icebreakerService) {
-
         $scope.reset = function ($event) {
             var icebreakers = icebreakerService.getIcebreakers();
             if (icebreakers.length > 0) {
 
                 var confirm = $mdDialog.confirm()
                   .title('Reset the game?')
-                  .textContent('There is/are (' + icebreakers.length + ') question(s) left. Continue?')
+                  .textContent('There is/are (' + icebreakers.length + ') question(s) left. Reset?')
                   .ariaLabel('Confirm')
                   .targetEvent($event)
                   .ok('Yes')
@@ -112,16 +89,16 @@
         };
         
         function reset () {
+            $scope.$broadcast('reset');
             icebreakerService.reset();
-            $rootScope.$broadcast('reset');
         }
     };
-
-    navController.$inject = ['$mdDialog', '$rootScope', '$scope', 'icebreakerService'];
-
-    angular.module('ys.icebreaker').controller('navController', navController);
+    
+    icebreakerGameController.$inject = ['$mdDialog', '$mdToast', '$log', '$scope', 'icebreakerService'];
+    
+    angular.module('ys.icebreaker').controller('icebreakerGameController', icebreakerGameController);
+    
 })(angular);
-
 (function (angular, Math) {
     'use strict';
 
