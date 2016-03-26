@@ -13,7 +13,7 @@ Try it on your own machine. Browse to the project's root directory and:
  * bower install (To install js and css components)
  * gulp min-js (To minify source js files)
  
-You can also use 'gulp concat-js' to 'concat' all js files rather than minifying it. Concatenated files are useful for debugging. Using the concat version requires you to change the source file in index.html to 'main.js'. By default the app uses the min source file named 'main.min.js'.
+You can also use 'gulp concat-js' to 'concat' all js files rather than minifying it. The 'concat' version is useful for debugging/development. Using the concat version requires you to change the source file in index.html to 'main.js'. By default the app uses the min source file named 'main.min.js'.
 
 P.S. You will be needing an http server to run the app. Try downloading 'http-server' using npm.
 
