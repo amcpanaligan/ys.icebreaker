@@ -10,3 +10,7 @@ md-toast .md-toast-content {
     background-color: #00beff !important;
     color: rgb(250,250,250);
 }
+
+#side-controls a {
+    margin: 0 5px;
+}

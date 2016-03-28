@@ -3,7 +3,8 @@
     
     var ysIcebreakerGame = function () {
         var template = '<div id="side-controls" class="right-align">' + 
-                            '<a class="btn-floating ys" ng-click="reset($event)"><i class="material-icons">repeat</i></a>' + 
+                            '<a class="btn-floating ys" ng-click="reset($event)"><i class="fa fa-repeat"></i></a>' +
+                            '<a class="btn-floating ys" ng-href="http://github.com/amcpanaligan/ys.icebreaker"><i class="fa fa-github"></i></a>' +
                         '</div>' +
                         '<div class="container center-align">' +
                             '<div class="row">' +

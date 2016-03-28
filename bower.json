@@ -24,6 +24,7 @@
     "angular-sanitize": "~1.5.2",
     "angular-material": "~1.0.6",
     "Materialize": "materialize#~0.97.5",
-    "angular-ui-router": "~0.2.18"
+    "angular-ui-router": "~0.2.18",
+    "font-awesome": "~4.5.0"
   }
 }
