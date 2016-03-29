@@ -1,6 +1,14 @@
 # ys.icebreaker
 I want to learn more about angular-material directives as well as Firebase cloud services. Here I developed an icebreaker app that implements angular, materialize, firebase, and angularFire. The Firebase cloud used in this app is hosted on my personal account. Firebase is a REAL TIME (syncs real time to anyone connected) 'NOSQL' database that stores your data as JSON. Cool!
 
+What's different?
+ * You are now allowed to add, and view icebreaker questions (Through the list view), thanks to Firebase!
+ * No repeating question
+
+How it works
+ * Retrieves data from Firebase to your browser's localstorage.
+ * Randomizer queries from the questions saved to the browser's localstorage, meaning different browsers can have different remaining questions. However, adding/removing a question syncs to all clients, automatically adding/removing that question to every client's localstorage.
+
 This app uses:
  * angular
  * Materialize
