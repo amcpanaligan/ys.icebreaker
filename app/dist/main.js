@@ -2,6 +2,7 @@
     //// initialize the app ys.icebreakers and its dependencies.
     var app = angular.module('ys.icebreaker', [
         'angular-storage',
+        'firebase',
         'ngMaterial',
         'ngSanitize',
         'ui.router'
@@ -10,19 +11,45 @@
 
 (function (angular) {
     'use strict';
+    angular.module('ys.icebreaker').run([
+        'firebaseService', 
+        function (firebaseService) {
+            var BASE_URL = 'https://burning-torch-9438.firebaseio.com/';
+            
+            firebaseService.setBaseUrl(BASE_URL);
+        }
+    ]);
+})(angular);
+(function (angular, document) {
+    'use strict';
     
     var app = angular.module('ys.icebreaker');
     
-    app.run(['$http', '$log', 'icebreakerService', function ($http, $log, icebreakerService) {
+    app.run(['$http', '$log', '$mdDialog', 'icebreakerService', 'store', function ($http, $log, $mdDialog, icebreakerService, store) {
         //// init returns a promise, continue using then block
         var initPromise = icebreakerService.initIcebreaker();
         
         initPromise.then(function () {
             $log.info('initialization completed!');
         });
+        
+        if (!store.get('user')) {
+            var confirm = $mdDialog.prompt()
+            .title('You are?')
+            .placeholder('Name')
+            .ariaLabel('Name')
+            .ok('Ok');
+            
+            $mdDialog.show(confirm).then(function(result) {
+                store.set('user', result);
+                $log.info('Current user is: ', result);
+            });
+        } else {
+            $log.info('Current user is:', store.get('user'));
+        }
     }]);
     
-})(angular);
+})(angular, document);
 
 (function () {
     'use strict';
@@ -30,22 +57,51 @@
     var app = angular.module('ys.icebreaker');
     
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
-        
-        $urlRouterProvider.otherwise('/game');
+        $urlRouterProvider.otherwise('/list');
         
         $stateProvider.state('game', {
             url: '/game',
-            templateUrl: 'templates/icebreaker-game.html',
+            template: '<ys-icebreaker-game></ys-icebreaker-game>',
             controller: 'icebreakerGameController'
         });
         
+        $stateProvider.state('list', {
+            url: '/list',
+            templateUrl: 'templates/icebreakerList.html',
+            controller: 'icebreakerListController'
+        });
     }]);
     
 })();
 (function (angular) {
     'use strict';
     
+    var addIcebreakerController = function ($mdDialog, $scope, firebaseService, icebreakerService) {
+        var firebaseIcebreakers = firebaseService.array('Icebreakers');
+        
+        $scope.add = function () {
+            icebreakerService.addIcebreaker($scope.icebreaker).then(function () {
+                //// success in adding, so resolve the dialog.
+                $mdDialog.hide(); 
+            });
+        };
+        
+        $scope.cancel = function () {
+            $mdDialog.cancel();  
+        };
+    };
+    
+    addIcebreakerController.$inject = ['$mdDialog', '$scope', 'firebaseService', 'icebreakerService'];
+    
+    angular.module('ys.icebreaker').controller('addIcebreakerController', addIcebreakerController);
+    
+})(angular);
+(function (angular, $) {
+    'use strict';
+    
     var icebreakerGameController = function ($mdDialog, $mdToast, $log, $scope, icebreakerService) {
+        ////$('.tooltipped').tooltip({delay: 50});
+        
         $scope.$on('gameover', function (event) {
             
         });
@@ -98,44 +154,126 @@
     
     angular.module('ys.icebreaker').controller('icebreakerGameController', icebreakerGameController);
     
+})(angular, $);
+(function (angular, document) {
+    'use strict';
+    
+    var icebreakerListController = function ($log, $mdDialog, $mdToast, $scope, firebaseService, icebreakerService) {
+        //// display current (local) and display list from firebase
+        loadIcebreakers();
+        
+        $scope.submit = function () {
+            icebreakerService.addIcebreaker($scope.question).then(function () {
+                var toast = $mdToast.simple({
+                    textContent: 'The icebreaker was successfully added.',
+                    position: 'top right',
+                    action: 'Dismiss'
+                });
+                $mdToast.show(toast);
+            });
+        };
+        
+        $scope.delete = function (item) {
+            var id = item.$id;
+            icebreakerService.removeIcebreaker(id).then(function () {
+                var toast = $mdToast.simple({
+                    textContent: 'The icebreaker was successfully deleted.',
+                    position: 'top right',
+                    action: 'Dismiss'
+                });
+                $mdToast.show(toast);
+            });
+        };
+        
+        function loadIcebreakers() {
+            //// load from firebase
+            var ref = firebaseService.array('Icebreakers');
+            ref.$loaded().then(function () {
+                $scope.firebaseIcebreakers = ref;
+            });
+
+            //// load from local
+            $scope.icebreakers = icebreakerService.getIcebreakers();
+        }
+    };
+    
+    icebreakerListController.$inject = ['$log', '$mdDialog', '$mdToast', '$scope', 'firebaseService', 'icebreakerService'];
+    
+    angular.module('ys.icebreaker').controller('icebreakerListController', icebreakerListController);
+    
+})(angular, document);
+(function (angular) {
+    'use strict';
+    var firebaseService = function ($firebaseArray, $firebaseObject) {
+        var svc = {};
+        
+        function setBaseUrl(baseUrl) {
+            svc.baseUrl = baseUrl;   
+        }
+        
+        function object(url) {
+            var ref = new Firebase(svc.baseUrl + url);
+            return $firebaseObject(ref);
+        }
+        
+        function array(url) {
+            var ref = new Firebase(svc.baseUrl + url);
+            return $firebaseArray(ref);
+        }
+        
+        svc.setBaseUrl = setBaseUrl;
+        svc.object = object;
+        svc.array = array;
+        
+        return svc;
+    };
+    
+    firebaseService.$inject = ['$firebaseArray', '$firebaseObject'];
+    
+    angular.module('ys.icebreaker').factory('firebaseService', firebaseService);
 })(angular);
 (function (angular, Math) {
     'use strict';
 
-    var icebreakerService = function ($http, $log, $rootScope, $q, store) {
+    var icebreakerService = function ($http, $log, $rootScope, $q, firebaseService, store) {
         var svc = {};
 
         svc.initIcebreaker = initIcebreaker;
         svc.getRandomIcebreaker = getRandomIcebreaker;
         svc.reset = reset;
         svc.getIcebreakers = getIcebreakers;
+        svc.addIcebreaker = addIcebreaker;
+        svc.removeIcebreaker = removeIcebreaker;
 
-        /*
-         * This function initializes the icebreaker application. Loads initial value from res files, or from local storage if available.
-         */
+        //// initializes the icebreaker game. Checks if existing questions are in the localStorage, otherwise fetches from firebase.
         function initIcebreaker() {
             $log.info('initializing icebreaker service...');
-            var result = $q.resolve();
             //// check if localStorage already has content.
             svc.icebreakers = store.get('icebreakers');
+            
+            var defer = $q.defer();
+            
             if (!svc.icebreakers) {
                 //// first time use in this machine, therefore load from the res files.
-                result = $http.get('res/icebreakers.json').then(function (response) {
-                    $log.info('icebreakers was successfully read from the file "icebreakers.json"');
-
-                    //// setup localStorage database.
-                    store.set('icebreakers', response.data);
+                var icebreakers = firebaseService.array('Icebreakers');
+                
+                icebreakers.$loaded().then(function () {
+                    $log.info('icebreakers was successfully fetched from firebase');
+                    //// setup localStorage for icebreakers.
+                    console.log(icebreakers);
+                    store.set('icebreakers', icebreakers);
+                    defer.resolve();
                 }, function (error) {
                     $log.warn('icebreakers.json get error', error);
                 });
+            } else {
+                defer.resolve();   
             }
-
-            return result;
+            
+            return defer.promise;
         }
 
-        /*
-         * This function gets a random icebreaker and removes the randomized to the current list of icebreaker questions.
-         */
+        //// gets a random icebreaker from the list saved in the localStorage and removes it afterwards.
         function getRandomIcebreaker() {
             var icebreakers = store.get('icebreakers');
             if (icebreakers) {
@@ -146,7 +284,9 @@
                     //// no more questions 
                     $log.info('All questions are used, game over. Please reset');
                     $rootScope.$broadcast('gameover');
-                    return 'No questions left. Please reset.';
+                    return {
+                        icebreaker: 'No questions left. Please reset.'   
+                    };
                 }
                 
                 if (maxIndex === 0) {
@@ -160,32 +300,117 @@
             }
         }
 
-        /*
-         * This function resets the icebreaker game.
-         */
+        //// resets the game. Clears the localStorage and re-fetch the data from firebase.
         function reset() {
-            var result = $http.get('res/icebreakers.json').then(function (response) {
+            var defer = $q.defer();
+            
+            var icebreakers = firebaseService.array('Icebreakers');
+            icebreakers.$loaded().then(function () {
                 $log.info('Icebreaker was successfully reset. Questions reloaded from file.')
 
                 //// setup localStorage database.
-                store.set('icebreakers', response.data);
+                store.set('icebreakers', icebreakers);
+                //// resolve promise for those calls that are waiting for the reset to complete.
+                defer.resolve();
             }, function (error) {
                 $log.warn('icebreakers.json get error', error);
             });
-            return result;
+            
+            return defer.promise;
         }
         
-        /*
-         * This function gets the current list of icebreakers stored in the localStorage.
-         */
+        //// gets the list of icebreakers in the localStorage. Which is the list where the randomizer randomize through.
         function getIcebreakers () {
             return store.get('icebreakers');
+        }
+        
+        //// adds the icebreaker to the current queued icebreakers (localStorage) and to firebase
+        function addIcebreaker (icebreaker) {
+            var defer = $q.defer();
+            
+            //// add the item to firebase and return the promise
+            var item = {
+                user: store.get('user'),
+                icebreaker: icebreaker,
+                $id: ''
+            };
+            var arr = firebaseService.array('Icebreakers');
+            arr.$loaded().then(function () {
+                
+                //// get current, modify and re-set.
+                arr.$add(item).then(function (newItem) {
+                    //var icebreakers = getIcebreakers();
+                    //item.$id = newItem.key();
+                    //icebreakers.push(item);
+                    //store.set('icebreakers', icebreakers);
+                    defer.resolve(); 
+                });
+                
+            });
+            
+            return defer.promise;
+        }
+        
+        //// removes the selected icebreaker from the current list and from firebase.
+        function removeIcebreaker(id) {
+            var defer = $q.defer();
+            
+            //// find the icebreaker from the localStorage and delete it
+            var icebreakers = store.get('icebreakers');
+            var i = 0;
+            for (i; i <= icebreakers.length - 1; i++) {
+                if (icebreakers[i].$id === id) {
+                    icebreakers.splice(i, 1);
+                    break;
+                }
+            }
+            store.set('icebreakers', icebreakers);
+            
+            //// delete the icebreaker from firebase.
+            var arr = firebaseService.array('Icebreakers');
+            arr.$loaded().then(function () {
+                var index = arr.$indexFor(id);
+                defer.resolve(arr.$remove(index));
+            });
+            
+            return defer.promise;
         }
 
         return svc;
     };
 
-    icebreakerService.$inject = ['$http', '$log', '$rootScope', '$q', 'store'];
-    angular.module('ys.icebreaker').service('icebreakerService', icebreakerService);
+    icebreakerService.$inject = ['$http', '$log', '$rootScope', '$q', 'firebaseService', 'store'];
+    angular.module('ys.icebreaker').factory('icebreakerService', icebreakerService);
 
 })(angular, Math);
+
+(function (angular) {
+    var app = angular.module('ys.icebreaker');
+    
+    var ysIcebreakerGame = function () {
+        var template = '<div id="side-controls" class="right-align">' + 
+                            '<a class="btn-floating ys" ng-click="reset($event)"><i class="fa fa-repeat"></i><md-tooltip md-direction="top">Reset</md-tooltip></a>' +
+                            '<a class="btn-floating ys" ui-sref="list"><i class="fa fa-list-alt"></i><md-tooltip md-direction="top">List</md-tooltip></a>' +
+                            '<a class="btn-floating ys" ng-href="http://github.com/amcpanaligan/ys.icebreaker" target="_blank"><i class="fa fa-github"></i><md-tooltip md-direction="top">Github</md-tooltip></a>' +
+                        '</div>' +
+                        '<div class="container center-align">' +
+                            '<div class="row">' +
+                                '<div class="col s12 m12">' +
+                                    '<button class="waves-effect waves-light btn-large ys" ng-click="play()">Play</button>' +
+                                    '<div class="card-panel ys" ng-show="icebreaker">' +
+                                        '<h2 class="white-text" ng-bind="icebreaker.icebreaker">' +
+                                        '</h2>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+        
+        return {
+            replace: false,
+            restrict: 'E',
+            template: template
+        };
+    };
+    
+    app.directive('ysIcebreakerGame', ysIcebreakerGame);
+})(angular);

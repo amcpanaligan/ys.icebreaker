@@ -4,7 +4,6 @@
     var app = angular.module('ys.icebreaker');
     
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
-        
         $urlRouterProvider.otherwise('/game');
         
         $stateProvider.state('game', {
@@ -13,6 +12,11 @@
             controller: 'icebreakerGameController'
         });
         
+        $stateProvider.state('list', {
+            url: '/list',
+            templateUrl: 'templates/icebreakerList.html',
+            controller: 'icebreakerListController'
+        });
     }]);
     
 })();

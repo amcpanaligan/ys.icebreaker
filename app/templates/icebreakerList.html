@@ -1,0 +1,75 @@
+<div ng-cloak>
+    <md-content>
+        <div class="right-align">
+            <a class="btn-floating ys" ui-sref="game"><i class="fa fa-gamepad"></i><md-tooltip md-direction="top">Game</md-tooltip></a>
+        </div>
+        <md-tabs md-dynamic-height md-border-bottom>
+            <md-tab label="Current">
+                <md-content class="md-padding">
+                    
+                    <table class="bordered" ng-show="icebreakers.length > 0">
+                        <thead>
+                            <tr>
+                                <th>Icebreaker</th>
+                                <th>Creator</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        
+                        <tbody>
+                            <tr ng-repeat="ib in icebreakers track by $index">
+                                <td ng-bind="ib.icebreaker"></td>
+                                <td ng-bind="ib.user"></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <h3 ng-show="!(icebreakers.length > 0)" class="md-display-2">No data available.</h3>
+                    
+                </md-content>
+            </md-tab>
+            <md-tab label="All">
+                <md-content class="md-padding">
+                    
+                    <div class="row">
+                        <form novalidate="novalidate" ng-submit="submit()">
+                            <div layout="row" flex>
+                                <md-input-container flex class="md-icon-float md-block md-title">
+                                    <label>Icebreaker</label>
+                                    <!-- below is the material icons -->
+                                    <input type="text" autocomplete="off" spellcheck="false" ng-model="question">
+                                </md-input-container>
+                                <div>
+                                    <button type="submit" class="btn md-raised ys">Add</button>
+                                </div>
+                            </div> 
+                        </form>
+                    </div>
+                    
+                    <table class="bordered" ng-show="firebaseIcebreakers.length > 0">
+                        <thead>
+                            <tr>
+                                <th>Icebreaker</th>
+                                <th>Creator</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        
+                        <tbody>
+                            <tr ng-repeat="fib in firebaseIcebreakers track by $index">
+                                <td ng-bind="fib.icebreaker"></td>
+                                <td ng-bind="fib.user"></td>
+                                <td>
+                                    <button class="btn ys" ng-click="delete(fib)">Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <h3 ng-show="!(firebaseIcebreakers.length > 0)" class="md-display-2">No data available.</h3>
+                </md-content>
+            </md-tab>
+        </md-tabs>
+    </md-content>
+</div>

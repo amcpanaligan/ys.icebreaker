@@ -22,9 +22,10 @@
     "angular": "~1.5.2",
     "a0-angular-storage": "~0.0.13",
     "angular-sanitize": "~1.5.2",
-    "angular-material": "~1.0.6",
+    "angular-material": "master",
     "Materialize": "materialize#~0.97.5",
     "angular-ui-router": "~0.2.18",
-    "font-awesome": "~4.5.0"
+    "font-awesome": "~4.5.0",
+    "angularfire": "~1.2.0"
   }
 }

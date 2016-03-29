@@ -1,7 +1,9 @@
-(function (angular) {
+(function (angular, $) {
     'use strict';
     
     var icebreakerGameController = function ($mdDialog, $mdToast, $log, $scope, icebreakerService) {
+        ////$('.tooltipped').tooltip({delay: 50});
+        
         $scope.$on('gameover', function (event) {
             
         });
@@ -54,4 +56,4 @@
     
     angular.module('ys.icebreaker').controller('icebreakerGameController', icebreakerGameController);
     
-})(angular);
+})(angular, $);
