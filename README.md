@@ -1,5 +1,5 @@
 # ys.icebreaker
-Self interest development of a simple icebreaker app for ys, in conjunction with my desire to learn material design and angular-material directives.
+I want to learn more about angular-material directives as well as Firebase cloud services. Here I developed an icebreaker app that implements angular, materialize, firebase, and angularFire. The Firebase cloud used in this app is hosted on my personal account. Firebase is a REAL TIME (syncs real time to anyone connected) 'NOSQL' database that stores your data as JSON. Cool!
 
 This app uses:
  * angular
@@ -7,6 +7,8 @@ This app uses:
  * angular-material
  * angular-ui-router
  * a0-angular-storage
+ * Firebase
+ * angularFire
 
 Try it on your own machine. Browse to the project's root directory and:
  * npm install (To install gulp components)
