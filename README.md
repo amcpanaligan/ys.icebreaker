@@ -1,5 +1,5 @@
 # ys.icebreaker
-I want to learn more about angular-material directives as well as Firebase cloud services. Here I developed an icebreaker app that implements angular, materialize, firebase, and angularFire. The Firebase cloud used in this app is hosted on my personal account. Firebase is a REAL TIME 'NOSQL' database that stores your data as JSON. Cool!
+I want to learn more about angular-material directives as well as Firebase cloud services. Here I developed an icebreaker app that implements angular, materialize, firebase, and angularFire. The Firebase cloud used in this app is hosted on my personal account. Firebase is a REAL TIME 'NOSQL' database that stores your data as JSON. Cool! Want to use your own firebase storage? Look for the file 'firebaseConfig.js' and change the BASE_URL to your own.
 
 What's different?
  * You are now allowed to add, and view icebreaker questions (Through the list view) thanks to Firebase!
