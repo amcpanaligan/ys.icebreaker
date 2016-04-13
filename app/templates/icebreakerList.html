@@ -2,6 +2,7 @@
     <md-content>
         <div class="right-align">
             <a class="btn-floating ys" ui-sref="game"><i class="fa fa-gamepad"></i><md-tooltip md-direction="top">Game</md-tooltip></a>
+            <a class="btn-floating ys" ng-if="!user" ng-click="login()"><i class="fa fa-google-plus"></i><md-tooltip md-direction="top">Sign In</md-tooltip></a>
         </div>
         <md-tabs md-dynamic-height md-border-bottom>
             <md-tab label="Current">
@@ -40,8 +41,9 @@
                                     <!-- below is the material icons -->
                                     <input type="text" autocomplete="off" spellcheck="false" ng-model="question">
                                 </md-input-container>
-                                <div>
-                                    <button type="submit" class="btn md-raised ys">Add</button>
+                                <div class="form-buttons">
+                                    <button ng-if="user" type="submit" class="btn md-raised ys">Add</button>
+                                    <button type="button" class="btn ys" ng-if="!user" ng-click="login()"><i class="fa fa-google-plus"></i><md-tooltip md-direction="top">Sign In</md-tooltip></button>
                                 </div>
                             </div> 
                         </form>
@@ -61,7 +63,7 @@
                                 <td ng-bind="fib.icebreaker"></td>
                                 <td ng-bind="fib.user"></td>
                                 <td>
-                                    <button class="btn ys" ng-click="delete(fib)">Delete</button>
+                                    <button class="btn ys" ng-if="user" ng-click="delete(fib)">Delete</button>
                                 </td>
                             </tr>
                         </tbody>

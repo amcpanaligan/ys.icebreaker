@@ -14,3 +14,7 @@ md-toast .md-toast-content {
 #side-controls a {
     margin: 0 5px;
 }
+
+.form-buttons button {
+    margin-top: 13px;   
+}

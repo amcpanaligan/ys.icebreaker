@@ -11,7 +11,7 @@
             $log.info('initialization completed!');
         });
         
-        if (!store.get('user')) {
+        /*if (!store.get('user')) {
             var confirm = $mdDialog.prompt()
             .title('You are?')
             .placeholder('Name')
@@ -24,7 +24,7 @@
             });
         } else {
             $log.info('Current user is:', store.get('user'));
-        }
+        }*/
     }]);
     
 })(angular, document);

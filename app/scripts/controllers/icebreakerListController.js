@@ -1,15 +1,27 @@
 (function (angular, document) {
     'use strict';
     
-    var icebreakerListController = function ($log, $mdDialog, $mdToast, $scope, firebaseService, icebreakerService) {
+    var icebreakerListController = function ($log, $mdDialog, $mdToast, $scope, firebaseService, GooglePlus, icebreakerService, store) {
         //// display current (local) and display list from firebase
         loadIcebreakers();
+        $scope.user = store.get('user');
+        
+        $scope.login = function () {
+            GooglePlus.login().then(function (authResult) {
+                GooglePlus.getUser().then(function (user) {
+                    $scope.user = user.email || user.name;
+                    store.set('user', $scope.user);
+                });
+            }, function (err) {
+                
+            });
+        };
         
         $scope.submit = function () {
             icebreakerService.addIcebreaker($scope.question).then(function () {
                 var toast = $mdToast.simple({
                     textContent: 'The icebreaker was successfully added.',
-                    position: 'top right',
+                    position: 'bottom right',
                     action: 'Dismiss'
                 });
                 $mdToast.show(toast);
@@ -21,7 +33,7 @@
             icebreakerService.removeIcebreaker(id).then(function () {
                 var toast = $mdToast.simple({
                     textContent: 'The icebreaker was successfully deleted.',
-                    position: 'top right',
+                    position: 'bottom right',
                     action: 'Dismiss'
                 });
                 $mdToast.show(toast);
@@ -40,7 +52,7 @@
         }
     };
     
-    icebreakerListController.$inject = ['$log', '$mdDialog', '$mdToast', '$scope', 'firebaseService', 'icebreakerService'];
+    icebreakerListController.$inject = ['$log', '$mdDialog', '$mdToast', '$scope', 'firebaseService', 'GooglePlus', 'icebreakerService', 'store'];
     
     angular.module('ys.icebreaker').controller('icebreakerListController', icebreakerListController);
     

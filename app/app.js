@@ -3,6 +3,7 @@
     var app = angular.module('ys.icebreaker', [
         'angular-storage',
         'firebase',
+        'googleplus',
         'ngMaterial',
         'ngSanitize',
         'ui.router'
