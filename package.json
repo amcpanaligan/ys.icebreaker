@@ -4,10 +4,13 @@
   "description": "",
   "main": "gulpfile.js",
   "dependencies": {
+    "express": "^4.13.4",
     "gulp": "^3.9.1",
     "gulp-bundle-assets": "^2.24.0",
     "gulp-concat": "^2.6.0",
-    "gulp-uglifyjs": "^0.6.2"
+    "gulp-uglifyjs": "^0.6.2",
+    "gzippo": "^0.2.0",
+    "morgan": "^1.7.0"
   },
   "devDependencies": {},
   "scripts": {
