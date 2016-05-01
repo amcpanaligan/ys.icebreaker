@@ -5,8 +5,8 @@
     
     app.config(['GooglePlusProvider', function(GooglePlusProvider) {
          GooglePlusProvider.init({
-           clientId: '603865153070-h5jaqp6u2cm6o6ijoqp7a66erk5mrifb.apps.googleusercontent.com',
-           apiKey: 'AIzaSyAaoVYp_IdQASCYxAdFOfPGxFHwDRY1qwA'
+           clientId: '603865153070-bprrivjg6tcucau5uleg4jstnea0l7qv.apps.googleusercontent.com',
+           apiKey: 'AIzaSyB1F4lzMptFVnxoLYqhTTvN8eBfnscoeLI'
          });
     }]);
     
