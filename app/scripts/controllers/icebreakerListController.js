@@ -40,6 +40,12 @@
             });
         };
         
+        $scope.deleteLocal = function (icebreaker) {
+            icebreakerService.removeIcebreakerLocal(icebreaker);  
+            //// load from local
+            $scope.icebreakers = icebreakerService.getIcebreakers();
+        };
+        
         function loadIcebreakers() {
             //// load from firebase
             var ref = firebaseService.array('Icebreakers');

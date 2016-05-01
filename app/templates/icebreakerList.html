@@ -21,7 +21,9 @@
                             <tr ng-repeat="ib in icebreakers track by $index">
                                 <td ng-bind="ib.icebreaker"></td>
                                 <td ng-bind="ib.user"></td>
-                                <td></td>
+                                <td>
+                                    <button class="btn ys" ng-if="user" ng-click="deleteLocal(ib)">Delete</button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

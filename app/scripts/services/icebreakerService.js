@@ -10,6 +10,7 @@
         svc.getIcebreakers = getIcebreakers;
         svc.addIcebreaker = addIcebreaker;
         svc.removeIcebreaker = removeIcebreaker;
+        svc.removeIcebreakerLocal = removeIcebreakerLocal;
 
         //// initializes the icebreaker game. Checks if existing questions are in the localStorage, otherwise fetches from firebase.
         function initIcebreaker() {
@@ -140,6 +141,16 @@
             });
             
             return defer.promise;
+        }
+        
+        function removeIcebreakerLocal(icebreaker) {
+            var localIcebreakers = store.get('icebreakers');
+            console.log('list', localIcebreakers);
+            var index = localIcebreakers.indexOf(icebreaker);
+            console.log('tobe deleted', index, icebreaker);
+            
+            localIcebreakers.splice(index, 1);
+            store.set('icebreakers', localIcebreakers);
         }
 
         return svc;
