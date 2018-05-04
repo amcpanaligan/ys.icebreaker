@@ -97,7 +97,7 @@
             
             //// add the item to firebase and return the promise
             var item = {
-                user: store.get('user'),
+                user: '-',
                 icebreaker: icebreaker,
                 $id: ''
             };

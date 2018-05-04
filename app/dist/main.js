@@ -3,76 +3,13 @@
     var app = angular.module('ys.icebreaker', [
         'angular-storage',
         'firebase',
+        'googleplus',
         'ngMaterial',
         'ngSanitize',
         'ui.router'
     ]);
 })();
 
-(function (angular) {
-    'use strict';
-    angular.module('ys.icebreaker').run([
-        'firebaseService', 
-        function (firebaseService) {
-            var BASE_URL = 'https://burning-torch-9438.firebaseio.com/';
-            
-            firebaseService.setBaseUrl(BASE_URL);
-        }
-    ]);
-})(angular);
-(function (angular, document) {
-    'use strict';
-    
-    var app = angular.module('ys.icebreaker');
-    
-    app.run(['$http', '$log', '$mdDialog', 'icebreakerService', 'store', function ($http, $log, $mdDialog, icebreakerService, store) {
-        //// init returns a promise, continue using then block
-        var initPromise = icebreakerService.initIcebreaker();
-        
-        initPromise.then(function () {
-            $log.info('initialization completed!');
-        });
-        
-        if (!store.get('user')) {
-            var confirm = $mdDialog.prompt()
-            .title('You are?')
-            .placeholder('Name')
-            .ariaLabel('Name')
-            .ok('Ok');
-            
-            $mdDialog.show(confirm).then(function(result) {
-                store.set('user', result);
-                $log.info('Current user is: ', result);
-            });
-        } else {
-            $log.info('Current user is:', store.get('user'));
-        }
-    }]);
-    
-})(angular, document);
-
-(function () {
-    'use strict';
-    
-    var app = angular.module('ys.icebreaker');
-    
-    app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
-        $urlRouterProvider.otherwise('/list');
-        
-        $stateProvider.state('game', {
-            url: '/game',
-            template: '<ys-icebreaker-game></ys-icebreaker-game>',
-            controller: 'icebreakerGameController'
-        });
-        
-        $stateProvider.state('list', {
-            url: '/list',
-            templateUrl: 'templates/icebreakerList.html',
-            controller: 'icebreakerListController'
-        });
-    }]);
-    
-})();
 (function (angular) {
     'use strict';
     
@@ -158,15 +95,27 @@
 (function (angular, document) {
     'use strict';
     
-    var icebreakerListController = function ($log, $mdDialog, $mdToast, $scope, firebaseService, icebreakerService) {
+    var icebreakerListController = function ($log, $mdDialog, $mdToast, $scope, firebaseService, GooglePlus, icebreakerService, store) {
         //// display current (local) and display list from firebase
         loadIcebreakers();
+        $scope.user = store.get('user');
+        
+        $scope.login = function () {
+            GooglePlus.login().then(function (authResult) {
+                GooglePlus.getUser().then(function (user) {
+                    $scope.user = user.email || user.name;
+                    store.set('user', $scope.user);
+                });
+            }, function (err) {
+                
+            });
+        };
         
         $scope.submit = function () {
             icebreakerService.addIcebreaker($scope.question).then(function () {
                 var toast = $mdToast.simple({
                     textContent: 'The icebreaker was successfully added.',
-                    position: 'top right',
+                    position: 'bottom right',
                     action: 'Dismiss'
                 });
                 $mdToast.show(toast);
@@ -178,11 +127,17 @@
             icebreakerService.removeIcebreaker(id).then(function () {
                 var toast = $mdToast.simple({
                     textContent: 'The icebreaker was successfully deleted.',
-                    position: 'top right',
+                    position: 'bottom right',
                     action: 'Dismiss'
                 });
                 $mdToast.show(toast);
             });
+        };
+        
+        $scope.deleteLocal = function (icebreaker) {
+            icebreakerService.removeIcebreakerLocal(icebreaker);  
+            //// load from local
+            $scope.icebreakers = icebreakerService.getIcebreakers();
         };
         
         function loadIcebreakers() {
@@ -197,11 +152,118 @@
         }
     };
     
-    icebreakerListController.$inject = ['$log', '$mdDialog', '$mdToast', '$scope', 'firebaseService', 'icebreakerService'];
+    icebreakerListController.$inject = ['$log', '$mdDialog', '$mdToast', '$scope', 'firebaseService', 'GooglePlus', 'icebreakerService', 'store'];
     
     angular.module('ys.icebreaker').controller('icebreakerListController', icebreakerListController);
     
 })(angular, document);
+(function (angular) {
+    var app = angular.module('ys.icebreaker');
+    
+    var ysIcebreakerGame = function () {
+        var template = '<div id="side-controls" class="right-align">' + 
+                            '<a class="btn-floating ys" ng-click="reset($event)"><i class="fa fa-repeat"></i><md-tooltip md-direction="top">Reset</md-tooltip></a>' +
+                            '<a class="btn-floating ys" ui-sref="list"><i class="fa fa-list-alt"></i><md-tooltip md-direction="top">List</md-tooltip></a>' +
+                            '<a class="btn-floating ys" ng-href="http://github.com/amcpanaligan/ys.icebreaker" target="_blank"><i class="fa fa-github"></i><md-tooltip md-direction="top">Github</md-tooltip></a>' +
+                        '</div>' +
+                        '<div class="container center-align">' +
+                            '<div class="row">' +
+                                '<div class="col s12 m12">' +
+                                    '<button class="waves-effect waves-light btn-large ys" ng-click="play()">Play</button>' +
+                                    '<div class="card-panel ys" ng-show="icebreaker">' +
+                                        '<h2 class="white-text" ng-bind="icebreaker.icebreaker">' +
+                                        '</h2>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+        
+        return {
+            replace: false,
+            restrict: 'E',
+            template: template
+        };
+    };
+    
+    app.directive('ysIcebreakerGame', ysIcebreakerGame);
+})(angular);
+(function (angular) {
+    'use strict';
+    angular.module('ys.icebreaker').run([
+        'firebaseService', 
+        function (firebaseService) {
+            var BASE_URL = 'https://burning-torch-9438.firebaseio.com/';
+            
+            firebaseService.setBaseUrl(BASE_URL);
+        }
+    ]);
+})(angular);
+(function (angular) {
+    'use strict';
+    
+    var app = angular.module('ys.icebreaker');
+    
+    app.config(['GooglePlusProvider', function(GooglePlusProvider) {
+         GooglePlusProvider.init({
+           clientId: '603865153070-bprrivjg6tcucau5uleg4jstnea0l7qv.apps.googleusercontent.com',
+           apiKey: 'AIzaSyB1F4lzMptFVnxoLYqhTTvN8eBfnscoeLI'
+         });
+    }]);
+    
+})(angular);
+(function (angular, document) {
+    'use strict';
+    
+    var app = angular.module('ys.icebreaker');
+    
+    app.run(['$http', '$log', '$mdDialog', 'icebreakerService', 'store', function ($http, $log, $mdDialog, icebreakerService, store) {
+        //// init returns a promise, continue using then block
+        var initPromise = icebreakerService.initIcebreaker();
+        
+        initPromise.then(function () {
+            $log.info('initialization completed!');
+        });
+        
+        /*if (!store.get('user')) {
+            var confirm = $mdDialog.prompt()
+            .title('You are?')
+            .placeholder('Name')
+            .ariaLabel('Name')
+            .ok('Ok');
+            
+            $mdDialog.show(confirm).then(function(result) {
+                store.set('user', result);
+                $log.info('Current user is: ', result);
+            });
+        } else {
+            $log.info('Current user is:', store.get('user'));
+        }*/
+    }]);
+    
+})(angular, document);
+
+(function () {
+    'use strict';
+    
+    var app = angular.module('ys.icebreaker');
+    
+    app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
+        $urlRouterProvider.otherwise('/game');
+        
+        $stateProvider.state('game', {
+            url: '/game',
+            template: '<ys-icebreaker-game></ys-icebreaker-game>',
+            controller: 'icebreakerGameController'
+        });
+        
+        $stateProvider.state('list', {
+            url: '/list',
+            templateUrl: 'templates/icebreakerList.html',
+            controller: 'icebreakerListController'
+        });
+    }]);
+    
+})();
 (function (angular) {
     'use strict';
     var firebaseService = function ($firebaseArray, $firebaseObject) {
@@ -244,6 +306,7 @@
         svc.getIcebreakers = getIcebreakers;
         svc.addIcebreaker = addIcebreaker;
         svc.removeIcebreaker = removeIcebreaker;
+        svc.removeIcebreakerLocal = removeIcebreakerLocal;
 
         //// initializes the icebreaker game. Checks if existing questions are in the localStorage, otherwise fetches from firebase.
         function initIcebreaker() {
@@ -375,6 +438,16 @@
             
             return defer.promise;
         }
+        
+        function removeIcebreakerLocal(icebreaker) {
+            var localIcebreakers = store.get('icebreakers');
+            console.log('list', localIcebreakers);
+            var index = localIcebreakers.indexOf(icebreaker);
+            console.log('tobe deleted', index, icebreaker);
+            
+            localIcebreakers.splice(index, 1);
+            store.set('icebreakers', localIcebreakers);
+        }
 
         return svc;
     };
@@ -383,34 +456,3 @@
     angular.module('ys.icebreaker').factory('icebreakerService', icebreakerService);
 
 })(angular, Math);
-
-(function (angular) {
-    var app = angular.module('ys.icebreaker');
-    
-    var ysIcebreakerGame = function () {
-        var template = '<div id="side-controls" class="right-align">' + 
-                            '<a class="btn-floating ys" ng-click="reset($event)"><i class="fa fa-repeat"></i><md-tooltip md-direction="top">Reset</md-tooltip></a>' +
-                            '<a class="btn-floating ys" ui-sref="list"><i class="fa fa-list-alt"></i><md-tooltip md-direction="top">List</md-tooltip></a>' +
-                            '<a class="btn-floating ys" ng-href="http://github.com/amcpanaligan/ys.icebreaker" target="_blank"><i class="fa fa-github"></i><md-tooltip md-direction="top">Github</md-tooltip></a>' +
-                        '</div>' +
-                        '<div class="container center-align">' +
-                            '<div class="row">' +
-                                '<div class="col s12 m12">' +
-                                    '<button class="waves-effect waves-light btn-large ys" ng-click="play()">Play</button>' +
-                                    '<div class="card-panel ys" ng-show="icebreaker">' +
-                                        '<h2 class="white-text" ng-bind="icebreaker.icebreaker">' +
-                                        '</h2>' +
-                                    '</div>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>';
-        
-        return {
-            replace: false,
-            restrict: 'E',
-            template: template
-        };
-    };
-    
-    app.directive('ysIcebreakerGame', ysIcebreakerGame);
-})(angular);

@@ -22,7 +22,7 @@
                                 <td ng-bind="ib.icebreaker"></td>
                                 <td ng-bind="ib.user"></td>
                                 <td>
-                                    <button class="btn ys" ng-if="user" ng-click="deleteLocal(ib)">Delete</button>
+                                    <button class="btn ys" ng-click="deleteLocal(ib)">Delete</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -44,8 +44,8 @@
                                     <input type="text" autocomplete="off" spellcheck="false" ng-model="question">
                                 </md-input-container>
                                 <div class="form-buttons">
-                                    <button ng-if="user" type="submit" class="btn md-raised ys">Add</button>
-                                    <button type="button" class="btn ys" ng-if="!user" ng-click="login()"><i class="fa fa-google-plus"></i><md-tooltip md-direction="top">Sign In</md-tooltip></button>
+                                    <button type="submit" class="btn md-raised ys">Add</button>
+                                    
                                 </div>
                             </div> 
                         </form>
@@ -65,7 +65,7 @@
                                 <td ng-bind="fib.icebreaker"></td>
                                 <td ng-bind="fib.user"></td>
                                 <td>
-                                    <button class="btn ys" ng-if="user" ng-click="delete(fib)">Delete</button>
+                                    <button class="btn ys" ng-click="delete(fib)">Delete</button>
                                 </td>
                             </tr>
                         </tbody>
